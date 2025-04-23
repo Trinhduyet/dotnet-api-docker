@@ -33,10 +33,10 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
-app.MapGet("/ping", () => Results.Ok("pong"))
+app.MapGet("/ping", () => Results.Ok("test"))
    .WithName("Ping")
    .WithOpenApi();
-   
+
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
