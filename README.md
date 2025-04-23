@@ -150,7 +150,43 @@ Vào repo GitHub → Settings → Secrets → Actions → **New Repository Secre
 2. Trỏ DNS về IP VPS qua Cloudflare
 3. Bật chế độ **Full SSL** trong Cloudflare
 4. Cài **Cloudflare Origin Certificate** (nếu muốn dùng SSL nâng cao)
+Cấu hình domain trinhduyet.fun qua Nginx reverse proxy → port 8081
+Sửa file cấu hình Nginx:
+bash
+Copy
+Edit
+sudo nano /etc/nginx/sites-available/trinhduyet.fun
+Dán nội dung sau:
 
+nginx
+Copy
+Edit
+server {
+    listen 80;
+    server_name trinhduyet.fun www.trinhduyet.fun;
+
+    location / {
+        proxy_pass http://localhost:8081;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection keep-alive;
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+Kích hoạt lại cấu hình:
+
+bash
+Copy
+Edit
+sudo nginx -t
+sudo systemctl reload nginx
+🔒 (Tuỳ chọn) SSL miễn phí với Cloudflare
+Nếu đã bật proxy + SSL trong Cloudflare, bạn không cần cài cert thủ công, chỉ cần:
+
+Cloudflare → SSL/TLS → chọn Full hoặc Full (strict)
+
+Đảm bảo bản ghi A trỏ về IP VPS và trạng thái Proxy bật (màu cam).
 ---
 
 ## ✅ Truy cập API
