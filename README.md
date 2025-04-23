@@ -1,6 +1,7 @@
-# .NET Web API + Docker + GitHub Actions CI/CD 🚀
+# 🚀 .NET Web API + Docker + GitHub Actions CI/CD
 
-Triển khai một ứng dụng .NET Web API lên VPS Ubuntu 24.04 bằng Docker, Docker Compose và GitHub Actions. Hỗ trợ domain và SSL miễn phí với Cloudflare.
+Triển khai ứng dụng .NET Web API lên VPS Ubuntu 24.04 bằng Docker, Docker Compose và GitHub Actions.  
+Hỗ trợ domain và SSL miễn phí với Cloudflare.
 
 ---
 
@@ -11,7 +12,7 @@ Triển khai một ứng dụng .NET Web API lên VPS Ubuntu 24.04 bằng Docker
 - GitHub Actions (CI/CD)
 - VPS Ubuntu 24.04 LTS
 - SSH key-based deploy
-- Cloudflare (miễn phí domain + HTTPS SSL)
+- Cloudflare (quản lý domain + HTTPS SSL miễn phí)
 
 ---
 
@@ -20,15 +21,18 @@ Triển khai một ứng dụng .NET Web API lên VPS Ubuntu 24.04 bằng Docker
 ```bash
 dotnet new webapi -n MyApi
 cd MyApi
-🐳 Bước 2: Tạo Dockerfile
-dockerfile
-Copy
-Edit
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+```
+
+---
+
+## 🐳 Bước 2: Tạo `Dockerfile`
+
+```Dockerfile
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["MyApi/MyApi.csproj", "MyApi/"]
 RUN dotnet restore "MyApi/MyApi.csproj"
@@ -43,46 +47,60 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "MyApi.dll"]
-📦 Bước 3: Tạo docker-compose.yml
-yaml
-Copy
-Edit
+```
+
+---
+
+## 📦 Bước 3: Tạo `docker-compose.yml`
+
+```yaml
 version: '3.8'
 services:
   webapi:
     build: .
     ports:
       - "5000:80"
-📡 Bước 4: Cài Docker & Docker Compose trên VPS
-bash
-Copy
-Edit
+```
+
+---
+
+## 📡 Bước 4: Cài Docker & Docker Compose trên VPS
+
+```bash
 sudo apt update
 sudo apt install -y docker.io
 sudo systemctl enable --now docker
 
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)"   -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
 docker --version
 docker-compose --version
-🔐 Bước 5: Thiết lập SSH Key Deploy
-Trên máy local:
-bash
-Copy
-Edit
-ssh-keygen -t ed25519 -C "github-deploy"
-Copy public key lên VPS:
-bash
-Copy
-Edit
-ssh-copy-id -i ~/.ssh/id_ed25519.pub root@<VPS_IP> -p 24700
-🛠️ Bước 6: Cấu hình GitHub Actions
-Tạo file .github/workflows/deploy.yml:
+```
 
-yaml
-Copy
-Edit
+---
+
+## 🔐 Bước 5: Thiết lập SSH Key để deploy
+
+Trên máy local:
+
+```bash
+ssh-keygen -t ed25519 -C "github-deploy"
+```
+
+Copy public key lên VPS:
+
+```bash
+ssh-copy-id -i ~/.ssh/id_ed25519.pub root@<VPS_IP> -p 24700
+```
+
+---
+
+## 🛠️ Bước 6: Cấu hình GitHub Actions
+
+Tạo file `.github/workflows/deploy.yml`:
+
+```yaml
 name: Deploy to VPS
 
 on:
@@ -94,47 +112,57 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.9.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Deploy over SSH
-      run: |
-        ssh -o StrictHostKeyChecking=no -p 24700 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-          cd /home/code/dotnet-api-docker/MyApi
-          git pull origin main
-          docker-compose down
-          docker-compose up -d --build
-        EOF
-🔑 Bước 7: Thêm GitHub Secrets
-Truy cập repo GitHub → Settings → Secrets → Actions → New Repository Secret:
+      - name: Deploy over SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no -p 24700 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd /home/code/dotnet-api-docker/MyApi
+            git pull origin main
+            docker-compose down
+            docker-compose up -d --build
+          EOF
+```
 
+---
 
-Key	Value (ví dụ)
-SSH_PRIVATE_KEY	Nội dung file ~/.ssh/id_ed25519
-VPS_USER	root hoặc user VPS khác
-VPS_HOST	Địa chỉ IP VPS của bạn
-🌐 Bước 8: Trỏ domain và cấu hình SSL Cloudflare
-Tạo domain miễn phí tại freenom.com
+## 🔑 Bước 7: Thêm GitHub Secrets
 
-Trỏ DNS về IP VPS thông qua Cloudflare
+Vào repo GitHub → Settings → Secrets → Actions → **New Repository Secret**
 
-Bật Full SSL trong Cloudflare
+| Key             | Value                                      |
+|----------------|--------------------------------------------|
+| SSH_PRIVATE_KEY | Nội dung file `~/.ssh/id_ed25519`         |
+| VPS_USER        | `root` hoặc user VPS khác                 |
+| VPS_HOST        | Địa chỉ IP của VPS                        |
 
-Cài đặt Cloudflare Origin Certificate (nếu muốn SSL nâng cao)
+---
 
-✅ Truy cập API
-bash
-Copy
-Edit
+## 🌐 Bước 8: Trỏ domain và cấu hình SSL Cloudflare
+
+1. Tạo domain miễn phí tại [freenom.com](https://www.freenom.com/)
+2. Trỏ DNS về IP VPS qua Cloudflare
+3. Bật chế độ **Full SSL** trong Cloudflare
+4. Cài **Cloudflare Origin Certificate** (nếu muốn dùng SSL nâng cao)
+
+---
+
+## ✅ Truy cập API
+
+Truy cập qua IP:
+
+```bash
 http://<your-vps-ip>:5000/weatherforecast
+```
+
 Hoặc qua domain:
 
-bash
-Copy
-Edit
+```bash
 https://yourdomain.com/weatherforecast
+```
