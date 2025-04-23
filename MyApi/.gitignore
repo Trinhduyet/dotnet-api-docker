@@ -1,0 +1,33 @@
+# Thư mục Build kết quả
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]eleases/
+[Aa]ssets/
+[Ll]ogs/
+[Ll]og/
+[Tt]estResults/
+[Tt]emp/
+[Bb]in/
+[Oo]bj/
+[Ll]ibrary/
+TreasureHuntAPI/.vs
+# NuGet Packages
+*.nupkg
+*.snupkg
+
+# JetBrains Rider
+.idea/
+
+# Tệp người dùng
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# Visual Studio for Mac
+.vscode/
+
+# Dotnet files
+*.csproj.user
+*.csproj.nuget.g.props
+*.csproj.nuget.g.targets=
