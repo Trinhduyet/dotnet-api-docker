@@ -6,7 +6,7 @@ Triển khai một ứng dụng .NET Web API lên VPS Ubuntu 24.04 bằng Docker
 
 ## 🧱 Công nghệ sử dụng
 
-- [.NET 6 Web API](https://learn.microsoft.com/en-us/aspnet/core/web-api)
+- [.NET 8 Web API](https://learn.microsoft.com/en-us/aspnet/core/web-api)
 - Docker + Docker Compose
 - GitHub Actions (CI/CD)
 - VPS Ubuntu 24.04 LTS
